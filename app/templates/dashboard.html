@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="card-grid">
+        <div class="card">
+            <h3>Notes</h3>
+            <div class="value">{{ notes_count }}</div>
+            <i class="fas fa-sticky-note fa-2x" style="position: absolute; top: 20px; right: 20px; opacity: 0.2;"></i>
+        </div>
+        <div class="card">
+            <h3>Assignments Pending</h3>
+            <div class="value">{{ assignments_pending }}</div>
+            <i class="fas fa-tasks fa-2x" style="position: absolute; top: 20px; right: 20px; opacity: 0.2;"></i>
+        </div>
+        <div class="card">
+            <h3>Overall Attendance</h3>
+            <div class="value">{{ overall_attendance }}%</div>
+            <i class="fas fa-user-check fa-2x" style="position: absolute; top: 20px; right: 20px; opacity: 0.2;"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="display: flex; gap: 2rem; flex-wrap: wrap;">
+    <div class="col-md-8" style="flex: 2; min-width: 300px;">
+        <div class="card">
+            <h3>Attendance Overview</h3>
+            <canvas id="attendanceChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-4" style="flex: 1; min-width: 300px;">
+        <div class="card">
+            <h3>Top Priority Tasks</h3>
+            <ul class="task-list">
+                {% for todo in todos %}
+                <li class="task-item">
+                    <span>{{ todo.task }}</span>
+                    <span class="badge badge-{{ todo.priority|lower }}">{{ todo.priority }}</span>
+                </li>
+                {% else %}
+                <p>No pending tasks.</p>
+                {% endfor %}
+            </ul>
+            <a href="{{ url_for('main.todo') }}" class="btn btn-primary"
+                style="display: block; text-align: center; margin-top: 1rem;">View All</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var ctx = document.getElementById('attendanceChart').getContext('2d');
+    var attendanceData = {
+        labels: [{% for a in all_attendance %}"{{ a.subject }}", {% endfor %}],
+    datasets: [{
+        label: 'Attendance %',
+        data: [{% for a in all_attendance %}{{ a.percentage }}, {% endfor %}],
+        backgroundColor: 'rgba(78, 115, 223, 0.5)',
+            borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 1
+        }]
+    };
+
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: attendanceData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

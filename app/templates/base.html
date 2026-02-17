@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCampus Pro</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    {% if current_user.is_authenticated %}
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i> SmartCampus
+            </div>
+            <button id="mobile-menu-btn" class="sidebar-toggle d-md-none"><i class="fas fa-bars"></i></button>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('main.dashboard') }}"
+                        class="{{ 'active' if request.endpoint == 'main.dashboard' else '' }}"><i
+                            class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                <li><a href="{{ url_for('main.notes') }}"
+                        class="{{ 'active' if request.endpoint == 'main.notes' else '' }}"><i
+                            class="fas fa-sticky-note"></i> <span>Notes</span></a></li>
+                <li><a href="{{ url_for('main.assignments') }}"
+                        class="{{ 'active' if request.endpoint == 'main.assignments' else '' }}"><i
+                            class="fas fa-tasks"></i> <span>Assignments</span></a></li>
+                <li><a href="{{ url_for('main.attendance') }}"
+                        class="{{ 'active' if request.endpoint == 'main.attendance' else '' }}"><i
+                            class="fas fa-user-check"></i> <span>Attendance</span></a></li>
+                <li><a href="{{ url_for('main.todo') }}"
+                        class="{{ 'active' if request.endpoint == 'main.todo' else '' }}"><i
+                            class="fas fa-check-square"></i> <span>To-Do</span></a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <h2>{{ self.title() }}</h2>
+                <div class="user-actions">
+                    <button id="theme-toggle" class="theme-toggle"><i class="fas fa-moon"></i></button>
+                    <span class="ml-3">Hi, {{ current_user.username }}</span>
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} mb-3">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% else %}
+    <!-- Public Pages (Login/Register/Index) -->
+    <header class="public-header">
+        <div class="header-container">
+            <a href="{{ url_for('main.index') }}" class="brand">
+                <i class="fas fa-graduation-cap"></i> SmartCampus
+            </a>
+            <div class="nav-actions">
+                <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Get Started</a>
+            </div>
+        </div>
+    </header>
+    {% block public_content %}{% endblock %}
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

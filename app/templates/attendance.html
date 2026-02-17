@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Add Subject -->
+    <div class="col-md-4" style="margin-bottom: 2rem;">
+        <div class="card">
+            <h3>Add Subject</h3>
+            <form method="POST" action="{{ url_for('main.attendance') }}">
+                <div class="form-group">
+                    <label>Subject Name</label>
+                    <input type="text" name="subject" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Total Classes Held</label>
+                    <input type="number" name="total_classes" class="form-control" value="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Classes Attended</label>
+                    <input type="number" name="attended_classes" class="form-control" value="0" min="0">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Subject</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Attendance List -->
+    <div class="col-md-8">
+        <h3>Attendance Overview</h3>
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            {% for subject in attendance %}
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h4>{{ subject.subject }}</h4>
+                    <a href="{{ url_for('main.delete_attendance', id=subject.id) }}" class="text-danger"
+                        onclick="return confirm('Delete this subject?')"><i class="fas fa-trash"></i></a>
+                </div>
+
+                <div style="margin: 1rem 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Percentage: <strong>{{ subject.percentage }}%</strong></span>
+                        <span>{{ subject.attended_classes }} / {{ subject.total_classes }}</span>
+                    </div>
+                    <div style="width: 100%; background-color: #e0e0e0; border-radius: 10px; height: 10px;">
+                        <div class="progress-fill progress-fill-{{ subject.status_class }}"
+                            data-percentage="{{ subject.percentage }}"
+                            style="height: 100%; border-radius: 10px; width: 0%;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions" style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                    <a href="{{ url_for('main.update_attendance', id=subject.id, action='present') }}"
+                        class="btn btn-success btn-sm"><i class="fas fa-check"></i> Present</a>
+                    <a href="{{ url_for('main.update_attendance', id=subject.id, action='absent') }}"
+                        class="btn btn-danger btn-sm"><i class="fas fa-times"></i> Absent</a>
+                </div>
+            </div>
+            {% else %}
+            <p>No subjects added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const progressBars = document.querySelectorAll('.progress-fill');
+        progressBars.forEach(bar => {
+            const percentage = bar.getAttribute('data-percentage');
+            // Small delay to allow transition if any
+            setTimeout(() => {
+                bar.style.width = percentage + '%';
+            }, 100);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Assignments{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Add Assignment -->
+    <div class="col-12" style="margin-bottom: 2rem;">
+        <div class="card">
+            <h3>Add New Assignment</h3>
+            <form method="POST" action="{{ url_for('main.assignments') }}"
+                style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; min-width: 200px;">
+                    <label>Subject</label>
+                    <input type="text" name="subject" class="form-control" required>
+                </div>
+                <div class="form-group" style="flex: 2; min-width: 300px;">
+                    <label>Title</label>
+                    <input type="text" name="title" class="form-control" required>
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 150px;">
+                    <label>Deadline</label>
+                    <input type="date" name="deadline" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="height: fit-content; margin-bottom: 0.5rem;">Add
+                    Assignment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pending Assignments -->
+    <div class="col-12">
+        <h3>Pending Assignments</h3>
+        <div class="assignment-list" style="margin-top: 1rem;">
+            {% for assignment in assignments %}
+            {% if not assignment.completed %}
+            <div class="card assignment-item"
+                style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--danger-color);">
+                <div>
+                    <h4 style="margin-bottom: 0.25rem;">{{ assignment.title }} <small class="text-muted">({{
+                            assignment.subject }})</small></h4>
+                    <p>Deadline: {{ assignment.deadline.strftime('%Y-%m-%d') }}</p>
+                </div>
+                <div class="actions">
+                    <a href="{{ url_for('main.complete_assignment', id=assignment.id) }}"
+                        class="btn btn-success btn-sm"><i class="fas fa-check"></i> Done</a>
+                    <a href="{{ url_for('main.delete_assignment', id=assignment.id) }}" class="btn btn-danger btn-sm"><i
+                            class="fas fa-trash"></i></a>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <h3 style="margin-top: 2rem;">Completed Assignments</h3>
+        <div class="assignment-list" style="margin-top: 1rem;">
+            {% for assignment in assignments %}
+            {% if assignment.completed %}
+            <div class="card assignment-item"
+                style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; opacity: 0.7; border-left: 5px solid var(--accent-color);">
+                <div>
+                    <h4 style="text-decoration: line-through; margin-bottom: 0.25rem;">{{ assignment.title }} <small
+                            class="text-muted">({{ assignment.subject }})</small></h4>
+                    <p>Completed</p>
+                </div>
+                <div class="actions">
+                    <a href="{{ url_for('main.delete_assignment', id=assignment.id) }}" class="btn btn-danger btn-sm"><i
+                            class="fas fa-trash"></i></a>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
